@@ -1,5 +1,6 @@
 
 using BookStore.Models;
+using BookStore.UnitOfWorks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,10 +29,22 @@ namespace BookStore
                     Type = "string",
                     Format = "date"
                 });
+                op.EnableAnnotations();
+                op.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "BookStore API - V1",
+                    Version = "v1",
+                    Description = "An API for managing books, authors, and customer orders in an online bookstore. This API allows users to browse available books, manage their orders, and view book details.",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Ahmed Salah Mohammed",
+                        Email = "ahmedsalahmohammed98@gmail.com"
+                    }
+                });
             });
             builder.Services.AddDbContext<BookStoreContext>(op => op.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("BookConn")));
             builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<BookStoreContext>();
-
+            builder.Services.AddScoped<UnitOfWork>();
             builder.Services.AddAuthentication(option =>
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

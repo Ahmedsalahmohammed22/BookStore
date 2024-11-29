@@ -1,9 +1,12 @@
 ﻿using BookStore.DTOs.AdminDTO;
+using BookStore.DTOs.BookDTOs;
 using BookStore.Models;
+using BookStore.UnitOfWorks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace BookStore.Controllers
 {
@@ -12,23 +15,27 @@ namespace BookStore.Controllers
     [Authorize(Roles = "admin")]
     public class AdminController : ControllerBase
     {
-        BookStoreContext _context;
-        UserManager<IdentityUser> _userManager;
-        RoleManager<IdentityRole> _roleManager;
-        public AdminController(BookStoreContext context , UserManager<IdentityUser> userManager , RoleManager<IdentityRole> roleManager)
+        UnitOfWork _unit;
+        public AdminController(UnitOfWork unit)
         {
-            _context = context;
-            _userManager = userManager;
-            _roleManager = roleManager;
+            _unit = unit;
         }
         [HttpGet]
+        [SwaggerOperation(Summary = "Get all admins",
+                  Description = "Fetches all users with the 'admin' role from the system.")]
+        [SwaggerResponse(200, "List of admins retrieved successfully.", typeof(List<Admin>))]
+        [SwaggerResponse(404, "No admins found.")]
         public async Task<IActionResult> GetAllAdmins()
         {
-            var admins = (await _userManager.GetUsersInRoleAsync("admin")).OfType<Admin>().ToList();
+            var admins = (await _unit.UserReps.GetUsersWithRole("admin")).OfType<Admin>().ToList();
             if(!admins.Any()) return NotFound();
             return Ok(admins);
         }
-        [HttpPost]
+        [HttpPost("CreateAdmin")]
+        [SwaggerOperation(Summary = "Create a new admin",
+                  Description = "Creates a new user with the 'admin' role.")]
+        [SwaggerResponse(200, "Admin created successfully.")]
+        [SwaggerResponse(400, "Invalid input or failed creation.")]
         public async Task<IActionResult> CreateAdmin(AdminDTO adminDTO)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -38,10 +45,10 @@ namespace BookStore.Controllers
                 Email = adminDTO.Email,
                 PhoneNumber = adminDTO.PhoneNumber,
             };
-            IdentityResult r = await _userManager.CreateAsync(admin,adminDTO.Password); 
+            IdentityResult r = await _unit.UserReps.CreateUser(admin,adminDTO.Password); 
             if (r.Succeeded) 
             {
-                IdentityResult adminRole = await _userManager.AddToRoleAsync(admin , "admin");
+                IdentityResult adminRole = await _unit.UserReps.AddRole(admin , "admin");
                 if (adminRole.Succeeded)
                 {
                     return Ok();

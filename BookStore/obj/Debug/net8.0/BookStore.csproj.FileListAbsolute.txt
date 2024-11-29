@@ -150,3 +150,5 @@ D:\projects_GitHub\BookStore\BookStore\bin\Debug\net8.0\BookStore.dll
 D:\projects_GitHub\BookStore\BookStore\bin\Debug\net8.0\BookStore.pdb
 D:\projects_GitHub\BookStore\BookStore\obj\Debug\net8.0\BookStore.genruntimeconfig.cache
 D:\projects_GitHub\BookStore\BookStore\obj\Debug\net8.0\ref\BookStore.dll
+D:\projects_GitHub\BookStore\BookStore\obj\Debug\net8.0\BookStore.sourcelink.json
+D:\projects_GitHub\BookStore\BookStore\bin\Debug\net8.0\Swashbuckle.AspNetCore.Annotations.dll

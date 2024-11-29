@@ -24,7 +24,7 @@ namespace BookStore.Repository
         }
         public void Update(TEntity entity)
         {
-            _context.Entry(entity).State = EntityState.Modified;
+             _context.Entry(entity).State = EntityState.Modified;
 
         }
         public async void Delete(int id)

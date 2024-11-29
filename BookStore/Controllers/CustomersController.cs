@@ -1,10 +1,12 @@
 ﻿using BookStore.DTOs.AccountDTOs;
 using BookStore.DTOs.CustomerDTOs;
 using BookStore.Models;
+using BookStore.UnitOfWorks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace BookStore.Controllers
 {
@@ -13,29 +15,30 @@ namespace BookStore.Controllers
     [Authorize (Roles = "admin")]
     public class CustomersController : ControllerBase
     {
-        BookStoreContext _context;
-        UserManager<IdentityUser> _userManager;
-        RoleManager<IdentityRole> _roleManager;
-        public CustomersController(BookStoreContext context , UserManager<IdentityUser> userManager , RoleManager<IdentityRole> roleManager)
+        UnitOfWork _unit;
+        public CustomersController(UnitOfWork unit)
         {
-            _context = context;
-            _userManager = userManager;
-            _roleManager = roleManager;
+            _unit = unit;
         }
         [Authorize (Roles = "customer")]
         [HttpPut]
+        [SwaggerOperation(Summary = "Edit user profile details",
+                  Description = "Allows the authenticated user to update their profile details.")]
+        [SwaggerResponse(204, "Profile updated successfully")]
+        [SwaggerResponse(400, "Bad request due to invalid data")]
+        [SwaggerResponse(404, "User not found")]
         public async Task<IActionResult> editProfile(EditCustomerDTO _customer)
         {
             if (ModelState.IsValid)
             {
-                Customer customer = (Customer)await _userManager.FindByNameAsync(User.Identity.Name);
+                Customer customer = (Customer)await _unit.UserReps.GetUserByName(User.Identity.Name);
                 if (customer == null) return NotFound();
                 customer.UserName = _customer.name;
                 customer.Email = _customer.email;
                 customer.address = _customer.address;
                 customer.PhoneNumber = _customer.phone;
                 customer.fullname = _customer.username;
-                var r = await _userManager.UpdateAsync(customer);
+                var r = await _unit.UserReps.UpdateUser(customer);
                 if (r.Succeeded) return NoContent();
                 else return BadRequest(r.Errors);
 
@@ -47,9 +50,13 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [SwaggerOperation(Summary = "Get all customers",
+                  Description = "Retrieves a list of all customers along with their profile information.")]
+        [SwaggerResponse(200, "List of customers retrieved successfully", typeof(List<SelectCustomerDTO>))]
+        [SwaggerResponse(404, "No customers found")]
         public async Task<IActionResult> GetAllAsync()
         {
-             var users = (await _userManager.GetUsersInRoleAsync("customer")).OfType<Customer>().ToList();
+             var users = (await _unit.UserReps.GetUsersWithRole("customer")).OfType<Customer>().ToList();
             if (!users.Any()) return NotFound();
             List<SelectCustomerDTO> cstDTO = new List<SelectCustomerDTO>();
             foreach (var user in users)
@@ -68,9 +75,13 @@ namespace BookStore.Controllers
             return Ok(cstDTO);
         }
         [HttpGet("{id}")]
+        [SwaggerOperation(Summary = "Get customer by ID",
+                  Description = "Retrieves the profile details of a customer by their unique ID.")]
+        [SwaggerResponse(200, "Customer details retrieved successfully", typeof(SelectCustomerDTO))]
+        [SwaggerResponse(404, "Customer not found")]
         public async Task<IActionResult> getbyid(string id)
         {
-            Customer customer = (Customer) _userManager.GetUsersInRoleAsync("customer").Result.Where(c => c.Id == id).FirstOrDefault();
+            Customer customer = (Customer) _unit.UserReps.GetUsersWithRole("customer").Result.Where(c => c.Id == id).FirstOrDefault();
             if (customer == null) return NotFound();
             SelectCustomerDTO selectCustomer = new SelectCustomerDTO()
             {

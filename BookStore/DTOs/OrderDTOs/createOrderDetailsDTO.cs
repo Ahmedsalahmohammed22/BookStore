@@ -8,8 +8,6 @@ namespace BookStore.DTOs.OrderDTOs
         public int book_id { get; set; }
         [Required]
         public int quantity { get; set;}
-        [Required]
-        public decimal unitPrice { get; set;}
 
     }
 }

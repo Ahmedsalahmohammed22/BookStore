@@ -7,7 +7,7 @@ namespace BookStore.DTOs.OrderDTOs
     {
 
         [Required]
-        public string status { get; set; }
+        public string cust_id { get; set; }
         [Required]
         public List<createOrderDetailsDTO> OrderDetails { get; set; }
 
