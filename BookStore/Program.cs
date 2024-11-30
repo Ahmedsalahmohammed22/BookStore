@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BookStore
 {
@@ -15,6 +16,7 @@ namespace BookStore
     {
         public static void Main(string[] args)
         {
+            string txt = "Bookstore Api";
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -63,6 +65,17 @@ namespace BookStore
                         ValidateAudience = false
                     };
                 });
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(txt,
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin();
+                        builder.AllowAnyHeader();
+                        builder.AllowAnyMethod();
+                    });
+            });
+
             var app = builder.Build();
 
 
@@ -76,6 +89,7 @@ namespace BookStore
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+            app.UseCors(txt);
 
 
             app.MapControllers();
