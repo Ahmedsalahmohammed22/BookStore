@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "hb46Iso4BHKOBAU0DF1/8qeF4ZkXPfu1AUx9HimIDYerHtJvRKgfknHOSqAMo5rQgghM68Xr1B7aJCXVH1N9gg==",
+  "dgSpecHash": "N38OZSp2Fa8RFaWbXen2twdKr4WQGau9ZLi5AyK+apDr+xNADyws6iTOSfnT+88Z7jXzFyu3KHrGUUsSfiKwRQ==",
   "success": true,
   "projectFilePath": "D:\\projects_GitHub\\BookStore\\BookStore\\BookStore.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\ahmed\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\ahmed\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\ahmed\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
     "C:\\Users\\ahmed\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",

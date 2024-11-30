@@ -105,7 +105,7 @@ namespace BookStore.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = await _unit.UserReps.GetUserById(pass.id);
+                var user = await _unit.UserReps.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 if (user == null) return NotFound();
                 var r = await _unit.UserReps.ChangePassword(user, pass.oldPassword, pass.newPassword);
                 if (r.Succeeded) return Ok();

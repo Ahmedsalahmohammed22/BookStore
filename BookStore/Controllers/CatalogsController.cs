@@ -95,31 +95,34 @@ namespace BookStore.Controllers
             Catalog catalog = await _unit.CatalogReps.Get(id);
             if (catalog == null) return NotFound($"Catalog with ID {id} not found.");
             _unit.CatalogReps.Delete(id);
-            List<Catalog> catalogs = await _unit.CatalogReps.GetAll();
-            List<CatalogDTO> catalogDTOs = new List<CatalogDTO>();
-            foreach (var cat in catalogs)
-            {
-                List<BookDetailsDTOs> bookDetailsDTOs = new List<BookDetailsDTOs>();
-                foreach(var book in cat.Books)
+            if (await _unit.Save() > 0) {
+                List<Catalog> catalogs = await _unit.CatalogReps.GetAll();
+                List<CatalogDTO> catalogDTOs = new List<CatalogDTO>();
+                foreach (var cat in catalogs)
                 {
-                    BookDetailsDTOs bkDetails = new BookDetailsDTOs()
+                    List<BookDetailsDTOs> bookDetailsDTOs = new List<BookDetailsDTOs>();
+                    foreach (var book in cat.Books)
                     {
-                        Book_title = book.title,
-                        Book_photo = book.photoPath,
-                        Book_price = book.price,
-                        Book_publishDate = book.publishDate,
+                        BookDetailsDTOs bkDetails = new BookDetailsDTOs()
+                        {
+                            Book_title = book.title,
+                            Book_photo = book.photoPath,
+                            Book_price = book.price,
+                            Book_publishDate = book.publishDate,
+                        };
+                        bookDetailsDTOs.Add(bkDetails);
+                    }
+                    CatalogDTO catalogsDTO = new CatalogDTO()
+                    {
+                        Id = cat.Id,
+                        Name = cat.Name,
+                        Description = cat.Description,
+                        Books = bookDetailsDTOs
                     };
-                    bookDetailsDTOs.Add(bkDetails);
+                    catalogDTOs.Add(catalogsDTO);
                 }
-                CatalogDTO catalogsDTO = new CatalogDTO()
-                {
-                    Name = cat.Name,
-                    Description = cat.Description,
-                    Books = bookDetailsDTOs
-                };
-                catalogDTOs.Add(catalogsDTO);
+                return Ok(catalogDTOs);
             }
-            if (await _unit.Save() > 0) return Ok(catalogDTOs);
             else return BadRequest();
         }
     }

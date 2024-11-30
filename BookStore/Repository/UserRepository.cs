@@ -47,7 +47,7 @@ namespace BookStore.Repository
         }
         public async Task<IList<IdentityUser>> GetUsersWithRole(string role)
         {
-            return await _userManager.GetUsersInRoleAsync("admin");
+            return await _userManager.GetUsersInRoleAsync(role);
         }
         public async Task<IdentityResult> UpdateUser(IdentityUser user)
         {

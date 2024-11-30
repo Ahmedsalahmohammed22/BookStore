@@ -12,7 +12,7 @@ namespace BookStore.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize (Roles = "admin")]
+    [Authorize]
     public class CustomersController : ControllerBase
     {
         UnitOfWork _unit;
@@ -48,7 +48,7 @@ namespace BookStore.Controllers
                 return BadRequest(ModelState);
             }
         }
-
+        [Authorize(Roles = "admin")]
         [HttpGet]
         [SwaggerOperation(Summary = "Get all customers",
                   Description = "Retrieves a list of all customers along with their profile information.")]
@@ -74,6 +74,7 @@ namespace BookStore.Controllers
             }
             return Ok(cstDTO);
         }
+        [Authorize(Roles = "admin")]
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Get customer by ID",
                   Description = "Retrieves the profile details of a customer by their unique ID.")]
@@ -81,7 +82,10 @@ namespace BookStore.Controllers
         [SwaggerResponse(404, "Customer not found")]
         public async Task<IActionResult> getbyid(string id)
         {
-            Customer customer = (Customer) _unit.UserReps.GetUsersWithRole("customer").Result.Where(c => c.Id == id).FirstOrDefault();
+            var customer =  _unit.UserReps.GetUsersWithRole("customer")
+                                .Result
+                                .OfType<Customer>()
+                                .Where(c => c.Id == id).FirstOrDefault();
             if (customer == null) return NotFound();
             SelectCustomerDTO selectCustomer = new SelectCustomerDTO()
             {

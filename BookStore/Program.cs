@@ -1,4 +1,5 @@
 
+using BookStore.Configrations;
 using BookStore.Models;
 using BookStore.UnitOfWorks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -75,6 +76,7 @@ namespace BookStore
                         builder.AllowAnyMethod();
                     });
             });
+            builder.Services.AddAutoMapper(typeof(MapperConfig));
 
             var app = builder.Build();
 

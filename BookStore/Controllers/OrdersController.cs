@@ -14,7 +14,7 @@ namespace BookStore.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "customer")]
+    [Authorize]
     public class OrdersController : ControllerBase
     {
         UnitOfWork _unit;
@@ -23,6 +23,7 @@ namespace BookStore.Controllers
         {
             _unit = unit;
         }
+        [Authorize(Roles = "customer")]
         [HttpPost]
         [SwaggerOperation(Summary = "Create a new order",
                   Description = "Creates a new order for the authenticated customer with book details and quantities.")]
@@ -101,7 +102,7 @@ namespace BookStore.Controllers
             if (!orders.Any()) return NotFound();
             return Ok(_unit.OrderFuncRepository.convertOrdersToOrderDTO(orders));
         }
-        
+        [Authorize (Roles = "admin")]
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Get order by ID",
                   Description = "Retrieves the details of a specific order by its ID.")]
@@ -113,6 +114,7 @@ namespace BookStore.Controllers
             if (order == null) return NotFound();
             return Ok(_unit.OrderFuncRepository.convertOrderToOrderDTO(order));
         }
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         [SwaggerOperation(Summary = "Update order status",
                   Description = "Updates the status of a specific order.")]
@@ -128,6 +130,7 @@ namespace BookStore.Controllers
             if (await _unit.Save() > 0) return NoContent();
             else return BadRequest();
         }
+        [Authorize(Roles = "customer")]
         [HttpGet("customer/orders")]
         [SwaggerOperation(Summary = "Get customer orders",
                   Description = "Retrieves a list of orders placed by the authenticated customer.")]

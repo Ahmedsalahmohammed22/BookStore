@@ -91,7 +91,7 @@ namespace BookStore.Controllers
             return NoContent();
 
         }
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         [SwaggerOperation(
             Summary = "Delete a book",
             Description = "Deletes a book by its ID. Returns the updated list of books if successful."
